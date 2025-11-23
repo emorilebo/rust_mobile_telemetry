@@ -1,4 +1,4 @@
-use opentelemetry::sdk::Resource;
+use opentelemetry_sdk::Resource;
 use opentelemetry::KeyValue;
 use opentelemetry::global;
 use tracing_subscriber::{layer::SubscriberExt, Registry};

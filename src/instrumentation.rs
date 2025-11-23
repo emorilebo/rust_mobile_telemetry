@@ -30,7 +30,7 @@ where
 pub fn get_counter(name: &str, description: &str) -> Counter<u64> {
     let meter = global::meter("rust_mobile_telemetry");
     meter
-        .u64_counter(name)
+        .u64_counter(name.to_string())
         .with_description(description.to_string())
         .init()
 }
@@ -39,7 +39,7 @@ pub fn get_counter(name: &str, description: &str) -> Counter<u64> {
 pub fn get_histogram(name: &str, description: &str) -> Histogram<f64> {
     let meter = global::meter("rust_mobile_telemetry");
     meter
-        .f64_histogram(name)
+        .f64_histogram(name.to_string())
         .with_description(description.to_string())
         .init()
 }

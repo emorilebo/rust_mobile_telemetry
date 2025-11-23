@@ -1,27 +1,36 @@
-use opentelemetry::sdk::trace::{self, Tracer};
-use opentelemetry::sdk::metrics::MeterProvider;
-use opentelemetry::sdk::Resource;
-use opentelemetry::global;
+use opentelemetry_sdk::trace::{self, Tracer, TracerProvider};
+use opentelemetry_sdk::metrics::{MeterProvider, PeriodicReader};
+use opentelemetry_sdk::Resource;
+use opentelemetry_sdk::runtime;
+use opentelemetry::{global, trace::TracerProvider as _};
 use opentelemetry_otlp::WithExportConfig;
 use std::time::Duration;
 
 use crate::config::Config;
 
 pub fn init_console_tracer(resource: Resource) -> Tracer {
-    opentelemetry_stdout::new_pipeline()
-        .trace()
-        .with_trace_config(
+    let exporter = opentelemetry_stdout::SpanExporter::default();
+    let provider = TracerProvider::builder()
+        .with_simple_exporter(exporter)
+        .with_config(
             trace::config()
                 .with_resource(resource)
                 .with_sampler(trace::Sampler::AlwaysOn),
         )
-        .install_simple()
+        .build();
+    
+    // Set global provider if needed, or just return the tracer
+    global::set_tracer_provider(provider.clone());
+    provider.tracer("rust_mobile_telemetry")
 }
 
 pub fn init_console_meter_provider(resource: Resource) -> MeterProvider {
-    opentelemetry_stdout::new_pipeline()
-        .metrics()
+    let exporter = opentelemetry_stdout::MetricsExporter::default();
+    let reader = PeriodicReader::builder(exporter, runtime::Tokio).build();
+    
+    MeterProvider::builder()
         .with_resource(resource)
+        .with_reader(reader)
         .build()
 }
 
@@ -40,7 +49,7 @@ pub fn init_otlp_tracer(config: &Config, resource: Resource) -> Result<Tracer, B
                 .with_resource(resource)
                 .with_sampler(trace::Sampler::AlwaysOn), // TODO: Make configurable
         )
-        .install_batch(opentelemetry::runtime::Tokio)
+        .install_batch(runtime::Tokio)
         .map_err(|e| e.into())
 }
 
@@ -48,7 +57,7 @@ pub fn init_otlp_meter_provider(config: &Config, resource: Resource) -> Result<M
     let endpoint = config.otlp_endpoint.as_deref().unwrap_or("http://localhost:4317");
 
     opentelemetry_otlp::new_pipeline()
-        .metrics(opentelemetry::runtime::Tokio)
+        .metrics(runtime::Tokio)
         .with_exporter(
             opentelemetry_otlp::new_exporter()
                 .tonic()
