@@ -58,6 +58,10 @@ pub fn init_telemetry(config: Config) -> Result<(), Box<dyn std::error::Error + 
     Ok(())
 }
 
+/// Shuts down the telemetry system and ensures all data is flushed.
+///
+/// This should be called before the application exits to ensure that any buffered
+/// traces or metrics are sent to the exporter.
 pub fn shutdown_telemetry() {
     global::shutdown_tracer_provider();
     // MeterProvider shutdown is not yet fully standardized in the same global way in all versions, 

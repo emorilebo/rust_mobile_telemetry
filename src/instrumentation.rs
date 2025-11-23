@@ -1,4 +1,4 @@
-use tracing::{Span, Level};
+use tracing::Level;
 use opentelemetry::global;
 use opentelemetry::metrics::Counter;
 use opentelemetry::metrics::Histogram;

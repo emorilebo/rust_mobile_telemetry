@@ -1,6 +1,6 @@
 [package]
 name = "rust_mobile_telemetry"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 authors = ["Godfrey Lebo <godfreylebo.dev>"]
 description = "Observability instrumentation (tracing + metrics) for mobile-backend applications or embedded / edge services."
