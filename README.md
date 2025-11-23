@@ -2,7 +2,7 @@
 
 [![Crates.io](https://img.shields.io/crates/v/rust_mobile_telemetry.svg)](https://crates.io/crates/rust_mobile_telemetry)
 [![Documentation](https://docs.rs/rust_mobile_telemetry/badge.svg)](https://docs.rs/rust_mobile_telemetry)
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/emorilebo/rust_mobile_telemetry/blob/main/LICENSE)
 
 **Observability made simple for mobile backends and edge services.**
 
