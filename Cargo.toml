@@ -1,0 +1,32 @@
+[package]
+name = "rust_mobile_telemetry"
+version = "0.1.0"
+edition = "2021"
+authors = ["Godfrey Lebo <godfreylebo.dev>"]
+description = "Observability instrumentation (tracing + metrics) for mobile-backend applications or embedded / edge services."
+license = "MIT"
+repository = "https://github.com/godfreylebo/rust_mobile_telemetry"
+readme = "README.md"
+keywords = ["telemetry", "opentelemetry", "tracing", "metrics", "mobile"]
+categories = ["development-tools::profiling", "asynchronous"]
+
+[dependencies]
+opentelemetry = { version = "0.21", features = ["metrics", "trace"] }
+opentelemetry_sdk = { version = "0.21", features = ["rt-tokio", "metrics", "trace"] }
+opentelemetry-otlp = { version = "0.14", features = ["grpc-tonic", "metrics", "trace"] }
+opentelemetry-stdout = { version = "0.2", features = ["trace", "metrics"] }
+tracing = "0.1"
+tracing-opentelemetry = "0.22"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "registry", "std"] }
+tokio = { version = "1", features = ["full"] }
+serde = { version = "1.0", features = ["derive"] }
+thiserror = "1.0"
+reqwest = { version = "0.11", features = ["json"], optional = true }
+
+[dev-dependencies]
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+
+[features]
+default = []
+instrumentation = ["reqwest"]

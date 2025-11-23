@@ -1,0 +1,10 @@
+/target
+/debug
+/release
+build_log.txt
+rustup-init.exe
+**/*.rs.bk
+*.swp
+.idea
+.vscode
+*.iml
