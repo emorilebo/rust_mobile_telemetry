@@ -63,3 +63,8 @@ pub use init::init_telemetry;
 pub use init::shutdown_telemetry;
 pub use instrumentation::with_span;
 pub use instrumentation::with_span_async;
+
+/// Compiles and runs the README's Rust code blocks as doctests.
+#[cfg(doctest)]
+#[doc = include_str!("../README.md")]
+struct ReadmeDoctests;
