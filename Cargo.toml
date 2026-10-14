@@ -1,14 +1,25 @@
 [package]
 name = "rust_mobile_telemetry"
-version = "0.1.3"
+version = "0.2.0"
 edition = "2021"
-authors = ["Godfrey Lebo <godfreylebo.dev>"]
-description = "Observability instrumentation (tracing + metrics) for mobile-backend applications or embedded / edge services."
+authors = ["Godfrey Lebo <emorylebo@gmail.com>"]
+description = "One-call OpenTelemetry setup for Rust mobile backends and edge services: tracing spans + metrics, OTLP or stdout export, app/device metadata, flush on shutdown."
 license = "MIT"
 repository = "https://github.com/emorilebo/rust_mobile_telemetry"
+homepage = "https://github.com/emorilebo/rust_mobile_telemetry"
+documentation = "https://docs.rs/rust_mobile_telemetry"
 readme = "README.md"
-keywords = ["telemetry", "opentelemetry", "tracing", "metrics", "mobile"]
-categories = ["development-tools::profiling", "asynchronous"]
+keywords = ["opentelemetry", "observability", "tracing", "metrics", "otlp"]
+categories = ["development-tools::profiling", "development-tools::debugging"]
+include = [
+    "src/**/*.rs",
+    "examples/**/*.rs",
+    "tests/**/*.rs",
+    "Cargo.toml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+]
 
 [dependencies]
 opentelemetry = { version = "0.21", features = ["metrics", "trace"] }
@@ -19,14 +30,15 @@ tracing = "0.1"
 tracing-opentelemetry = "0.22"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "registry", "std"] }
 tokio = { version = "1", features = ["full"] }
-serde = { version = "1.0", features = ["derive"] }
-thiserror = "1.0"
-reqwest = { version = "0.11", features = ["json"], optional = true }
 
 [dev-dependencies]
-reqwest = { version = "0.11", features = ["json"] }
+opentelemetry-proto = { version = "0.4", features = ["gen-tonic", "trace", "metrics"] }
 tokio = { version = "1", features = ["full"] }
+tokio-stream = { version = "0.1", features = ["net"] }
+tonic = "0.9"
 
 [features]
 default = []
-instrumentation = ["reqwest"]
+# Deprecated no-op, kept so `features = ["instrumentation"]` keeps compiling.
+# It used to pull in `reqwest`, which no code in this crate ever used.
+instrumentation = []

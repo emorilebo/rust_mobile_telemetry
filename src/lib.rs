@@ -1,33 +1,65 @@
-//! # Rust Mobile Telemetry
+//! # rust_mobile_telemetry
 //!
-//! `rust_mobile_telemetry` provides a production-quality observability instrumentation
-//! (tracing + metrics) layer for mobile-backend applications or embedded / edge services.
+//! One-call [OpenTelemetry](https://opentelemetry.io/) setup for Rust mobile
+//! backends and edge services: `tracing` spans and metrics, exported to stdout
+//! (`Console`) or to any OTLP/gRPC collector (`Otlp`), tagged with the service
+//! name and optional app/device metadata, and flushed on shutdown.
 //!
-//! It is built on top of the OpenTelemetry ecosystem and simplifies the setup process
-//! by providing sensible defaults and easy-to-use builders.
+//! ## Quick start
 //!
-//! ## Quick Start
+//! ```
+//! use rust_mobile_telemetry::instrumentation::get_counter;
+//! use rust_mobile_telemetry::{
+//!     init_telemetry, shutdown_telemetry, with_span, ConfigBuilder, ExporterType, MobileMetadata,
+//! };
 //!
-//! ```rust,no_run
-//! use rust_mobile_telemetry::{ConfigBuilder, init_telemetry};
-//!
-//! fn main() {
+//! #[tokio::main]
+//! async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
 //!     let config = ConfigBuilder::new()
-//!         .service_name("my-service")
+//!         .service_name("checkout-api")
+//!         .exporter_type(ExporterType::Console) // `Otlp` in production
+//!         .mobile_metadata(MobileMetadata {
+//!             app_version: Some("2.4.1".into()),
+//!             device_os: Some("Android 14".into()),
+//!             device_id: None, // only sent if you set it
+//!         })
 //!         .build();
+//!     init_telemetry(config)?;
 //!
-//!     init_telemetry(config).unwrap();
+//!     let orders = get_counter("orders_total", "Orders placed");
+//!     with_span("place_order", || orders.add(1, &[]));
+//!
+//!     shutdown_telemetry(); // flush spans and metrics before exit
+//!     Ok(())
 //! }
 //! ```
+//!
+//! ## What gets installed
+//!
+//! [`init_telemetry`] sets a global `tracing` subscriber (filtered by `RUST_LOG`,
+//! default `info`) bridged to OpenTelemetry, plus the global OpenTelemetry
+//! tracer and meter providers. Any `tracing` span in your application at or
+//! above the filter level is exported, not just the ones created through
+//! [`with_span`].
+//!
+//! Nothing is collected automatically: the exported resource carries
+//! `service.name` plus whichever [`MobileMetadata`] fields you set.
+//!
+//! See the [README](https://github.com/emorilebo/rust_mobile_telemetry#readme)
+//! for configuration, limitations and FAQ.
+
+#![warn(missing_docs)]
 
 pub mod config;
+pub mod exporters;
 pub mod init;
 pub mod instrumentation;
-pub mod exporters;
 
 pub use config::Config;
 pub use config::ConfigBuilder;
-pub use config::MobileMetadata;
 pub use config::ExporterType;
+pub use config::MobileMetadata;
 pub use init::init_telemetry;
+pub use init::shutdown_telemetry;
 pub use instrumentation::with_span;
+pub use instrumentation::with_span_async;

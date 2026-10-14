@@ -1,5 +1,5 @@
-use rust_mobile_telemetry::{ConfigBuilder, ExporterType, init_telemetry};
-use rust_mobile_telemetry::instrumentation::{with_span, get_counter};
+use rust_mobile_telemetry::instrumentation::{get_counter, with_span};
+use rust_mobile_telemetry::{init_telemetry, ConfigBuilder, ExporterType};
 
 #[tokio::test]
 async fn test_initialization_and_instrumentation() {
@@ -15,12 +15,12 @@ async fn test_initialization_and_instrumentation() {
 
     // 3. Test Instrumentation
     let counter = get_counter("test_counter", "A test counter");
-    
+
     with_span("test_span", || {
         counter.add(1, &[]);
     });
 
     // If we reached here without panic, basic API usage works.
-    // Verifying actual export would require a Mock Exporter or capturing stdout, 
+    // Verifying actual export would require a Mock Exporter or capturing stdout,
     // which is more complex for a basic smoke test.
 }

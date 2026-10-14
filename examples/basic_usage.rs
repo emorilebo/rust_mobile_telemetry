@@ -1,5 +1,11 @@
-use rust_mobile_telemetry::{ConfigBuilder, ExporterType, init_telemetry, with_span, MobileMetadata};
+//! Prints spans and metrics to stdout as JSON lines.
+//!
+//! Run with: `cargo run --example basic_usage`
+
 use rust_mobile_telemetry::instrumentation::{get_counter, get_histogram};
+use rust_mobile_telemetry::{
+    init_telemetry, shutdown_telemetry, with_span, ConfigBuilder, ExporterType, MobileMetadata,
+};
 use std::thread;
 use std::time::Duration;
 
@@ -30,25 +36,23 @@ async fn main() -> Result<(), Box<dyn std::error::Error + Send + Sync>> {
     for i in 1..=3 {
         with_span(&format!("process_request_{}", i), || {
             println!("Processing request {}", i);
-            
+
             request_counter.add(1, &[]);
-            
+
             let start = std::time::Instant::now();
-            
+
             // Simulate work
             thread::sleep(Duration::from_millis(100 * i));
-            
+
             let duration = start.elapsed().as_secs_f64();
             latency_histogram.record(duration, &[]);
         });
     }
 
     println!("Operations complete. Shutting down...");
-    
-    // Allow some time for background export (especially for OTLP, though Console is usually immediate)
-    tokio::time::sleep(Duration::from_secs(1)).await;
-    
-    rust_mobile_telemetry::init::shutdown_telemetry();
+
+    // 4. Flush the last spans and the final metric values before exiting.
+    shutdown_telemetry();
 
     Ok(())
 }
